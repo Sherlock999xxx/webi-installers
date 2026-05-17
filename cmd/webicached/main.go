@@ -35,6 +35,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/webinstall/webi-installers/internal/classifypkg"
+	"github.com/webinstall/webi-installers/internal/httpclient"
 	"github.com/webinstall/webi-installers/internal/installerconf"
 	"github.com/webinstall/webi-installers/internal/rawcache"
 	"github.com/webinstall/webi-installers/internal/releases/chromedist"
@@ -166,10 +167,10 @@ func main() {
 		auth = &githubish.Auth{Token: cfg.token}
 	}
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := httpclient.New()
 	if cfg.pageDelay > 0 {
 		client.Transport = &delayTransport{
-			base:  http.DefaultTransport,
+			base:  client.Transport,
 			delay: cfg.pageDelay,
 		}
 	}
