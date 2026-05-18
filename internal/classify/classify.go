@@ -12,6 +12,7 @@ package classify
 import (
 	"path"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/webinstall/webi-installers/internal/buildmeta"
@@ -268,16 +269,11 @@ func IsMetaAsset(name string) bool {
 			return true
 		}
 	}
-	for _, exact := range []string{
+	return slices.Contains([]string{
 		"install.sh",
 		"install.ps1",
 		"compat.json",
 		"b3sums",
 		"dist-manifest.json",
-	} {
-		if lower == exact {
-			return true
-		}
-	}
-	return false
+	}, lower)
 }

@@ -21,9 +21,6 @@ import (
 func TagVariants(assets []storage.Asset) {
 	for i := range assets {
 		lower := strings.ToLower(assets[i].Filename)
-		if strings.Contains(lower, "-profile") {
-			assets[i].Variants = append(assets[i].Variants, "profile")
-		}
 		if assets[i].Arch == "x86_64" {
 			if strings.Contains(lower, "-baseline") {
 				// Baseline is plain x86_64 — strip the suffix from

@@ -18,8 +18,15 @@ case "${g_host}" in
 esac
 
 fn_build() {
-	b_version="$(git describe --tags --always 2> /dev/null || echo '0.0.0-dev')"
+	b_tag="$(git describe --tags --abbrev=0 --match 'cmd/webicached/*' 2> /dev/null || echo 'cmd/webicached/v0.0.0')"
+	b_tag_ver="$(printf '%s' "${b_tag}" | sed 's:^cmd/webicached/::')"
+	b_count="$(git log --oneline "${b_tag}..HEAD" -- cmd/ internal/ 2> /dev/null | wc -l | tr -d ' \t')"
 	b_commit="$(git rev-parse --short HEAD)"
+	if test "${b_count}" -gt 0; then
+		b_version="${b_tag_ver}-${b_count}-g${b_commit}"
+	else
+		b_version="${b_tag_ver}"
+	fi
 	b_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 	b_ldflags="-X main.version=${b_version} -X main.commit=${b_commit} -X main.date=${b_date}"
 

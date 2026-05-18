@@ -23,15 +23,8 @@ var winVersionRe = regexp.MustCompile(`(?i)-win(?:7|8|81|10|2008|2012|2016)`)
 func TagVariants(assets []storage.Asset) {
 	for i := range assets {
 		lower := strings.ToLower(assets[i].Filename)
-		switch {
-		case strings.Contains(lower, "-fxdependentwindesktop"):
-			assets[i].Variants = append(assets[i].Variants, "fxdependentWinDesktop")
-		case strings.Contains(lower, "-fxdependent"):
-			assets[i].Variants = append(assets[i].Variants, "fxdependent")
-		case winVersionRe.MatchString(lower):
+		if winVersionRe.MatchString(lower) {
 			assets[i].Variants = append(assets[i].Variants, "win-version-specific")
-		case strings.HasSuffix(lower, ".appimage"):
-			assets[i].Variants = append(assets[i].Variants, "appimage")
 		}
 	}
 }

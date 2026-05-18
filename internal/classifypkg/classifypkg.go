@@ -25,7 +25,6 @@ import (
 	"github.com/webinstall/webi-installers/internal/releases/chromedist"
 	"github.com/webinstall/webi-installers/internal/releases/cmake"
 	"github.com/webinstall/webi-installers/internal/releases/fish"
-	"github.com/webinstall/webi-installers/internal/releases/gitea"
 	"github.com/webinstall/webi-installers/internal/releases/flutterdist"
 	"github.com/webinstall/webi-installers/internal/releases/git"
 	"github.com/webinstall/webi-installers/internal/releases/golang"
@@ -41,7 +40,7 @@ import (
 	"github.com/webinstall/webi-installers/internal/releases/postgres"
 	"github.com/webinstall/webi-installers/internal/releases/sass"
 	"github.com/webinstall/webi-installers/internal/releases/servicemandist"
-	"github.com/webinstall/webi-installers/internal/releases/sttr"
+	sttrdist "github.com/webinstall/webi-installers/internal/releases/sttr"
 	"github.com/webinstall/webi-installers/internal/releases/uuidv7"
 	"github.com/webinstall/webi-installers/internal/releases/watchexec"
 	"github.com/webinstall/webi-installers/internal/releases/xcaddy"
@@ -98,7 +97,7 @@ func Package(pkg string, conf *installerconf.Conf, d *rawcache.Dir, gitTagDir *r
 		assets = append(assets, gitAssets...)
 	}
 
-	TagVariants(pkg, assets)
+	TagVariants(pkg, conf.Variants, assets)
 	assets = expandUniversal(assets)
 	NormalizeVersions(pkg, assets)
 	processGitTagHEAD(assets)
@@ -194,9 +193,19 @@ func NormalizeVersions(pkg string, assets []storage.Asset) {
 	}
 }
 
-// TagVariants applies package-specific variant tags to classified assets.
-// Each case delegates to a per-installer package under internal/releases/.
-func TagVariants(pkg string, assets []storage.Asset) {
+// TagVariants applies variant tags to classified assets.
+// conf variants (from releases.conf) are applied first: each variant is
+// matched as a case-folded substring of the filename. Package-specific
+// logic runs after for cases that require more than a substring check.
+func TagVariants(pkg string, confVariants []string, assets []storage.Asset) {
+	for i := range assets {
+		lower := strings.ToLower(assets[i].Filename)
+		for _, v := range confVariants {
+			if strings.Contains(lower, strings.ToLower(v)) {
+				assets[i].Variants = append(assets[i].Variants, v)
+			}
+		}
+	}
 	switch pkg {
 	case "atomicparsley":
 		atomicparsleydist.TagVariants(assets)
@@ -210,8 +219,6 @@ func TagVariants(pkg string, assets []storage.Asset) {
 		flutterdist.TagVariants(assets)
 	case "git":
 		gitdist.TagVariants(assets)
-	case "gitea":
-		gitea.TagVariants(assets)
 	case "lsd":
 		lsddist.TagVariants(assets)
 	case "node":
