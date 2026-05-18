@@ -16,7 +16,7 @@ __init_yq() {
     pkg_install() {
         mkdir -p "$(dirname "$pkg_src_cmd")"
         # yq_linux_amd64.tar.gz contains:
-        #   - yq_linux_amd64
+        #   - yq_linux_amd64 (binary with platform suffix — needs rename)
         #   - yq.1
         #   - install-man-page.sh
         if [ -e ./yq.1 ]; then
