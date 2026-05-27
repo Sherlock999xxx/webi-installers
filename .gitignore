@@ -18,15 +18,21 @@ install-*.ps1
 *.env
 .env
 !example.env
+LOCAL.md
 
 # caches
 _cache/
 node_modules/
 
 # temporary & backup files
+agents/
 .*.sw*
 *.bak
 *.bak.*
+tmp
+*.tmp
+tmp.*
+*.tmp.*
 
 # agent session files
 agents/
